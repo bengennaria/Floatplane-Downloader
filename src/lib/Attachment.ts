@@ -111,7 +111,7 @@ export class Attachment implements AttachmentAttributes {
 			"%hour%": nPad(this.releaseDate.getHours()),
 			"%minute%": nPad(this.releaseDate.getMinutes()),
 			"%second%": nPad(this.releaseDate.getSeconds()),
-			"%videoTitle%": sanitize(this.videoTitle.replace(/ - /g, " ").replace(/\//g, " ").replace(/\\/g, " ")),
+			"%videoTitle%": sanitize(this.videoTitle.replace(/…/g, "...").replace(/\\/g, " ").replace(/\s+/g, " ")),
 		};
 
 		for (const [match, value] of Object.entries(formatLookup)) {

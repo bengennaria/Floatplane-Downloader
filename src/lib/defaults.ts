@@ -1,6 +1,6 @@
 import { Resolutions, Channels, Settings, Args } from "./types.js";
 
-export const defaultResolutions: Resolutions = ["360", "720", "1080", "2160"];
+export const defaultResolutions: Resolutions = ["360", "720", "1080", "1440", "2160", "3840", "4320"];
 export const defaultSubChannels: Record<string, Channels> = {
 	"59f94c0bdd241b70349eb72b": [
 		{
@@ -14,6 +14,11 @@ export const defaultSubChannels: Record<string, Channels> = {
 			isChannel: "(post) => post.title?.toLowerCase().includes('tl short: ')",
 		},
 		{
+			title: "Carpool Critics",
+			skip: false,
+			isChannel: "(post) => post.title?.toLowerCase().includes('cc: ')",
+		},
+		{
 			title: "The WAN Show",
 			skip: false,
 			isChannel: "(post) => post.title?.toLowerCase().includes('wan show')",
@@ -21,7 +26,10 @@ export const defaultSubChannels: Record<string, Channels> = {
 		{
 			title: "LMG Livestream VODs",
 			skip: false,
-			isChannel: "(post) => post.title?.toLowerCase().includes('livestream vod – ')",
+			isChannel: "(post) => (" +
+				"post.title?.toLowerCase().includes('livestream vod - ') || " +
+				"post.title?.toLowerCase().includes('[livestream archive] ')" +
+				")",
 		},
 	],
 };

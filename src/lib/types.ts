@@ -1,14 +1,18 @@
-export type Resolutions = ["360", "720", "1080", "2160"];
+export type Resolutions = ["360", "720", "1080", "1440", "2160", "3840", "4320"];
 
 import type { ValueOfA } from "@inrixia/helpers/ts";
 
 export type ChannelOptions = {
 	title: string;
+	titleOverride?: string;
 	skip: boolean;
 	isChannel: string;
 	daysToKeepVideos?: number;
+	replace?: string[];
+	postTitleChecks?: postTitleChecks;
 };
 
+export type postTitleChecks = Array<{ match_title: string; result_title: string }>;
 export type Channels = ChannelOptions[];
 
 export type PlexSections = Array<{ server: string; section: string }>;

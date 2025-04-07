@@ -47,7 +47,7 @@ const downloadNewVideos = async () => {
 	await Promise.all(inProgress);
 
 	// Enforce search limits after searching once.
-	settings.floatplane.videosToSearch = defaultSettings.floatplane.videosToSearch;
+	//settings.floatplane.videosToSearch = defaultSettings.floatplane.videosToSearch;
 
 	if (settings.floatplane.waitForNewVideos === true) {
 		console.log(`Checking for new videos in 5 minutes...`);

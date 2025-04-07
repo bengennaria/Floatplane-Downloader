@@ -18,11 +18,13 @@ export class ProgressBars extends ProgressLogger implements IProgressLogger {
 
 	private _lastTick = 0;
 	private _downloadSpeed = 0;
+	private _displayTickRefreshRate = 50;
+	private _lastDisplayUpdate = 0;
 
 	constructor(title: string) {
 		super(title);
 
-		this.title = title.slice(0, 32).trim();
+		this.title = title.slice(0, 48).trim();
 		let i = 1;
 		while (ProgressBars._Bars.getIndex(this.title) !== undefined) this.title = `${this.title} [${++i}]`;
 		ProgressBars.Total++;
@@ -60,6 +62,7 @@ export class ProgressBars extends ProgressLogger implements IProgressLogger {
 
 	public onDownloadProgress(progress: Progress, bytesSinceLast: number): void {
 		if (progress.total === undefined) return;
+		let showUpdate = false;
 
 		ProgressBars.DownloadedBytes += bytesSinceLast;
 
@@ -70,6 +73,11 @@ export class ProgressBars extends ProgressLogger implements IProgressLogger {
 
 		const elapsedSinceLastTick = (Date.now() - this._lastTick) / 1000;
 		this._lastTick = Date.now();
+
+		if (this._lastDisplayUpdate == 0 || (Date.now() - this._lastDisplayUpdate) > this._displayTickRefreshRate || progress.percent >= 99) {
+			this._lastDisplayUpdate = Date.now();
+			showUpdate = true;
+		}
 
 		const downloadSpeed = bytesSinceLast / elapsedSinceLastTick;
 		if (!isNaN(downloadSpeed)) {
@@ -83,12 +91,14 @@ export class ProgressBars extends ProgressLogger implements IProgressLogger {
 		const speed = chalk`{green ${(this._downloadSpeed / 125000).toFixed(2)} mb/s}`;
 		const eta = chalk`ETA: {blue ${Math.floor(downloadETA / 60)}m ${Math.floor(downloadETA) % 60}s}`;
 
-		this.updateTask({
-			percentage: progress.percent,
-			message: `${downloaded} ${speed} ${eta}`,
-		});
+		if (showUpdate) {
+			this.updateTask({
+				percentage: progress.percent,
+				message: `${downloaded} ${speed} ${eta}`,
+			});
 
-		this.updateSummaryBar();
+			this.updateSummaryBar();
+		}
 	}
 
 	private updateSummaryBar() {

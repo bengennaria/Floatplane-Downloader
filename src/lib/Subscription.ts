@@ -76,16 +76,26 @@ export default class Subscription {
 
 			for (const channel of this.channels) {
 				if (channel.isChannel === undefined) continue;
+
+				const postTitleChecks = channel.postTitleChecks !== undefined ? [...channel.postTitleChecks] : [];
+				let titleMatched = false;
+				for (const postTitleCheck of postTitleChecks) {
+					if(post.title === postTitleCheck.match_title) {
+						titleMatched = true;
+						post.title = postTitleCheck.result_title;
+					}
+				}
+
 				const isChannel =
 					Subscription.isChannelCache[channel.isChannel] ??
 					(Subscription.isChannelCache[channel.isChannel] = new Function(`${Subscription.isChannelHelper};return ${channel.isChannel};`)() as isChannel);
 
-				if (!isChannel(post, video)) continue;
+				if (!titleMatched && !isChannel(post, video)) continue;
 				if (channel.skip) break;
 				if (channel.daysToKeepVideos !== undefined && new Date(post.releaseDate).getTime() < Subscription.getIgnoreBeforeTimestamp(channel)) return;
 
 				// Remove the identifier from the video title if to give a nicer title
-				if (settings.extras.stripSubchannelPrefix === true) {
+				if (!titleMatched && settings.extras.stripSubchannelPrefix === true) {
 					const replacers = [
 						new RegExp(channel.title.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "i"),
 						/MA: /i,
@@ -100,6 +110,11 @@ export default class Subscription {
 						/Livestream VOD – /i,
 						/ : /i,
 					];
+					if(channel.replace !== undefined) {
+						for (const searchString of channel.replace) {
+							replacers.push(new RegExp(searchString.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "i"));
+						}
+					}
 					for (const regIdCheck of replacers) {
 						post.title = post.title.replace(regIdCheck, "");
 					}
@@ -113,7 +128,7 @@ export default class Subscription {
 					attachmentId,
 					description: post.text,
 					artworkUrl: post.thumbnail?.path,
-					channelTitle: channel.title,
+					channelTitle: (channel.titleOverride !== undefined) ? channel.titleOverride : channel.title,
 					videoTitle: post.title,
 					releaseDate: new Date(new Date(post.releaseDate).getTime() + dateOffset * 1000),
 				});

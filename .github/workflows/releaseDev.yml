@@ -3,7 +3,7 @@ name: "[dev] Release"
 on:
  push:
   branches:
-   - "dev"
+   - "dev-bg"
   paths-ignore:
    - "**/*.md"
    - ".vscode/**"
